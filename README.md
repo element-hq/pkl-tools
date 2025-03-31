@@ -1,4 +1,3 @@
-# .github
-Default metadata files for repos in this org.
+# Pkl Tools
 
-If you're seeing this readme in your project, your project is configured wrong.
+Some helpful tools for use across all of our Pkl projects.
