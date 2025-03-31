@@ -1,0 +1,153 @@
+//
+// Copyright 2025 New Vector Ltd.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+
+module io.element.staticCode.Kotlin
+
+import "StaticCode.pkl"
+
+class ReflectedObject extends StaticCode.ReflectedType {
+  /// The instance's name.
+  name: String
+  /// The type of this object.
+  typeName: String
+  /// Whether or not this object is allowed to be null.
+  nullable: Boolean
+  /// All of the object's properties.
+  properties: List<StaticCode.ReflectedType>
+
+  /// If the object has no value (because it is purely a type definition).
+  fixed isNull: Boolean = properties.first.getClass() == ReflectedPropertyDefinition // Don't use `is` because of inheritance.
+
+  function render(indentLevel: Int): String =
+    """
+    \(indent(indentLevel))object \(name.capitalize()) {
+    \(properties.map((property) ->
+      if (property is ReflectedObject)
+        "\(indent(indentLevel + 1))val \(property.name): \(property.renderedTypeHint) = \(property.renderValue(indentLevel + 1))"
+      else
+        "\(property.render(indentLevel + 1))"
+    ).join("\n"))
+    \(typeDefinitions.map((property) -> property.renderDefinition(indentLevel + 1)).join("\n"))
+    \(indent(indentLevel))}
+    """
+
+  /// Renders the object's value for assignment (i.e. it's initialiser).
+  function renderValue(indentLevel: Int): String =
+    if (isNull)
+      "null"
+    else
+      """
+      \(renderedType)(
+      \(properties.map((property) ->
+        if (property is ReflectedObject)
+          "\(indent(indentLevel + 1))\(property.name) = \(property.renderValue(indentLevel + 1))"
+        else
+          "\(indent(indentLevel + 1))\(property.name) = \(property.renderedValue)"
+      ).join(",\n"))
+      \(indent(indentLevel)))
+      """
+
+  /// Renders the object's definition without any values.
+  function renderDefinition(indentLevel: Int): String =
+    """
+    \(indent(indentLevel))data class \(renderedType)(
+    \(properties.map((property) ->
+      if (property is ReflectedObject)
+        "\(indent(indentLevel + 1))val \(property.name): \(property.renderedTypeHint)"
+      else
+        "\(indent(indentLevel + 1))val \(property.name): \(property.renderedType)"
+    ).join(",\n"))
+    \(indent(indentLevel)))
+    """
+
+  fixed renderedType = typeName.capitalize()
+  fixed renderedTypeHint: String =
+    if (nullable) "\(renderedType)?" else renderedType
+
+  hidden fixed typeDefinitions: List<ReflectedObject> =
+    properties.flatMap((property) ->
+      if (property is ReflectedObject)
+        List(property) + property.typeDefinitions
+      else
+        List()
+    )
+      .toMap((property) -> property.typeName, (property) -> property).values // Remove duplicates based on typeName.
+}
+
+/// An object's property without an accompanying value.
+///
+/// This is used for null objects where we just need to render a type definition.
+open class ReflectedPropertyDefinition extends StaticCode.ReflectedType {
+  name: String
+  type: String
+  typeArguments: List<String>
+  nullable: Boolean
+
+  function render(indentLevel: Int): String =
+    "\(indent(indentLevel))val \(name): \(renderedType)"
+
+  fixed renderedType: String =
+    let (kotlinType = typeMap.getOrNull(type) ?? type)
+      let (finalType = if (kotlinType == "List") "List<\(typeMap[typeArguments.getOrNull(0) ?? "Any"])>" else kotlinType)
+        if (nullable) "\(finalType)?" else finalType
+
+  hidden typeMap: Mapping<String, String> = new {
+    ["Int"] = "Long"
+    ["Float"] = "Double"
+    ["Boolean"] = "Boolean"
+    ["String"] = "String"
+    ["List"] = "List"
+    ["Listing"] = "List"
+  }
+}
+
+class ReflectedProperty extends ReflectedPropertyDefinition {
+  value: Any
+
+  function render(indentLevel: Int): String =
+    "\(indent(indentLevel))\(keywords)val \(name): \(renderedType) = \(renderedValue)"
+
+  hidden fixed keywords: String =
+    if (value is List || value is Listing || nullable) "" else "const "
+
+  hidden fixed renderedValue: String =
+    if (value == null)
+      "null"
+    else if (value is Number || value is Boolean)
+      "\(value)"
+    else if (value is String)
+      renderString(value)
+    else if (value is List)
+      renderList(value)
+    else if (value is Listing)
+      renderList(value.toList())
+    else
+      throw("Unsupported value type (\(value.getClass())) encountered when rendering \(name)")
+
+  local function renderList(value: List) =
+    "listOf(\(value.map((element) -> renderListElement(element)).join(", ")))"
+
+  local function renderListElement(value: Any) =
+    if (value is String) renderString(value) else "\(value)"
+
+  local function renderString(value: String) =
+    if (value.contains("\n"))
+      ("\"\"\"" +
+        value +
+        "\"\"\"")
+    else
+      "\"" + value + "\""
+}

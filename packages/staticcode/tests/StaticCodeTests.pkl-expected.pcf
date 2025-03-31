@@ -1,0 +1,246 @@
+examples {
+  ["Swift Renderer"] {
+    """
+    enum TestConfiguration {
+        static let someString: String = "Hello, World!"
+        static let someOptionalString: String? = nil
+        static let someObject: SomeClass = SomeClass(
+            someString: "bob",
+            someInteger: 0,
+            anEmptyStringList: [],
+            anIntList: [1, 2, 3],
+            aStringList: ["A", "B", "C"],
+            someNestedObject: SomeOtherClass(
+                someBoolean: false,
+                someDecimal: 0.5
+            )
+        )
+        struct SomeClass {
+            let someString: String
+            let someInteger: Int
+            let anEmptyStringList: Array<String>
+            let anIntList: Array<Int>
+            let aStringList: Array<String>
+            let someNestedObject: SomeOtherClass
+        }
+        struct SomeOtherClass {
+            let someBoolean: Bool
+            let someDecimal: Double
+        }
+    }
+    """
+  }
+  ["Kotlin Renderer"] {
+    """
+    package my.package
+    
+    object TestConfiguration {
+        const val someString: String = "Hello, World!"
+        val someOptionalString: String? = null
+        val someObject: SomeClass = SomeClass(
+            someString = "bob",
+            someInteger = 0,
+            anEmptyStringList = listOf(),
+            anIntList = listOf(1, 2, 3),
+            aStringList = listOf("A", "B", "C"),
+            someNestedObject = SomeOtherClass(
+                someBoolean = false,
+                someDecimal = 0.5
+            )
+        )
+        data class SomeClass(
+            val someString: String,
+            val someInteger: Long,
+            val anEmptyStringList: List<String>,
+            val anIntList: List<Long>,
+            val aStringList: List<String>,
+            val someNestedObject: SomeOtherClass
+        )
+        data class SomeOtherClass(
+            val someBoolean: Boolean,
+            val someDecimal: Double
+        )
+    }
+    """
+  }
+  ["Swift Simple Module"] {
+    """
+    enum TestModule {
+        static let name: String = "Alice"
+        static let friends: Array<String> = ["Bob", "Charlie"]
+    
+    }
+    """
+  }
+  ["Kotlin Simple Module"] {
+    """
+    package my.package
+    
+    object TestModule {
+        const val name: String = "Alice"
+        val friends: List<String> = listOf("Bob", "Charlie")
+    
+    }
+    """
+  }
+  ["Swift Repeated Types"] {
+    """
+    enum TestTypes {
+        static let phone: Device = Device(
+            name: "iPhone"
+        )
+        static let tablet: Device = Device(
+            name: "iPad"
+        )
+        static let laptop: Device = Device(
+            name: "MacBook"
+        )
+        static let desktop: Device = Device(
+            name: "iMac"
+        )
+        static let cover: Cover = Cover(
+            name: "Magic Keyboard",
+            device: Device(
+                name: "iPad"
+            )
+        )
+        struct Device {
+            let name: String
+        }
+        struct Cover {
+            let name: String
+            let device: Device
+        }
+    }
+    """
+  }
+  ["Kotlin Repeated Types"] {
+    """
+    package my.package
+    
+    object TestTypes {
+        val phone: Device = Device(
+            name = "iPhone"
+        )
+        val tablet: Device = Device(
+            name = "iPad"
+        )
+        val laptop: Device = Device(
+            name = "MacBook"
+        )
+        val desktop: Device = Device(
+            name = "iMac"
+        )
+        val cover: Cover = Cover(
+            name = "Magic Keyboard",
+            device = Device(
+                name = "iPad"
+            )
+        )
+        data class Device(
+            val name: String
+        )
+        data class Cover(
+            val name: String,
+            val device: Device
+        )
+    }
+    """
+  }
+  ["Swift Nullable Values"] {
+    """
+    enum NullableTypes {
+        static let someNullableString: String? = nil
+        static let nullableObject: OuterClass? = OuterClass(
+            required: InnerClass(
+                value: true
+            ),
+            requiredWithNull: NullableInnerClass(
+                value: nil
+            ),
+            nullable: nil
+        )
+        static let nullObject: UnusedClass? = nil
+        struct OuterClass {
+            let required: InnerClass
+            let requiredWithNull: NullableInnerClass
+            let nullable: InnerClass?
+        }
+        struct InnerClass {
+            let value: Bool
+        }
+        struct NullableInnerClass {
+            let value: Bool?
+        }
+        struct UnusedClass {
+            let value: String
+        }
+    }
+    """
+  }
+  ["Kotlin Nullable Values"] {
+    """
+    package my.package
+    
+    object NullableTypes {
+        val someNullableString: String? = null
+        val nullableObject: OuterClass? = OuterClass(
+            required = InnerClass(
+                value = true
+            ),
+            requiredWithNull = NullableInnerClass(
+                value = null
+            ),
+            nullable = null
+        )
+        val nullObject: UnusedClass? = null
+        data class OuterClass(
+            val required: InnerClass,
+            val requiredWithNull: NullableInnerClass,
+            val nullable: InnerClass?
+        )
+        data class InnerClass(
+            val value: Boolean
+        )
+        data class NullableInnerClass(
+            val value: Boolean?
+        )
+        data class UnusedClass(
+            val value: String
+        )
+    }
+    """
+  }
+  ["Swift Module Types"] {
+    """
+    enum ModuleTypes {
+        static let alice: ImportedModule = ImportedModule(
+            name: "Alice",
+            age: 25
+        )
+        static let bob: ImportedModule? = nil
+        struct ImportedModule {
+            let name: String
+            let age: Int
+        }
+    }
+    """
+  }
+  ["Kotlin Module Types"] {
+    """
+    package my.package
+    
+    object ModuleTypes {
+        val alice: ImportedModule = ImportedModule(
+            name = "Alice",
+            age = 25
+        )
+        val bob: ImportedModule? = null
+        data class ImportedModule(
+            val name: String,
+            val age: Long
+        )
+    }
+    """
+  }
+}
