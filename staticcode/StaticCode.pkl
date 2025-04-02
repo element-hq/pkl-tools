@@ -24,6 +24,7 @@ typealias Language = "Swift"|"Kotlin"
 
 /// A value renderer that outputs Swift code.
 class Renderer extends ValueRenderer {
+  /// The language that should be rendered.
   language: Language
   /// The package that the rendered file belongs to.
   ///
