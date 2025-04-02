@@ -1,7 +1,7 @@
 examples {
-  ["Swift Renderer"] {
+  ["Standard Types: Swift"] {
     """
-    enum TestConfiguration {
+    enum StandardTypes {
         static let someString: String = "Hello, World!"
         static let someOptionalString: String? = nil
         static let someObject: SomeClass = SomeClass(
@@ -30,11 +30,11 @@ examples {
     }
     """
   }
-  ["Kotlin Renderer"] {
+  ["Standard Types: Kotlin"] {
     """
     package my.package
     
-    object TestConfiguration {
+    object StandardTypes {
         const val someString: String = "Hello, World!"
         val someOptionalString: String? = null
         val someObject: SomeClass = SomeClass(
@@ -63,29 +63,29 @@ examples {
     }
     """
   }
-  ["Swift Simple Module"] {
+  ["Basic: Swift"] {
     """
-    enum TestModule {
+    enum User {
         static let name: String = "Alice"
         static let friends: Array<String> = ["Bob", "Charlie"]
     
     }
     """
   }
-  ["Kotlin Simple Module"] {
+  ["Basic: Kotlin"] {
     """
     package my.package
     
-    object TestModule {
+    object User {
         const val name: String = "Alice"
         val friends: List<String> = listOf("Bob", "Charlie")
     
     }
     """
   }
-  ["Swift Repeated Types"] {
+  ["Multiple Instances: Swift"] {
     """
-    enum TestTypes {
+    enum Equipment {
         static let phone: Device = Device(
             name: "iPhone"
         )
@@ -114,11 +114,11 @@ examples {
     }
     """
   }
-  ["Kotlin Repeated Types"] {
+  ["Multiple Instances: Kotlin"] {
     """
     package my.package
     
-    object TestTypes {
+    object Equipment {
         val phone: Device = Device(
             name = "iPhone"
         )
@@ -147,10 +147,10 @@ examples {
     }
     """
   }
-  ["Swift Nullable Values"] {
+  ["Nullable Properties: Swift"] {
     """
-    enum NullableTypes {
-        static let someNullableString: String? = nil
+    enum NullableProperties {
+        static let nullableString: String? = nil
         static let nullableObject: OuterClass? = OuterClass(
             required: InnerClass(
                 value: true
@@ -158,13 +158,13 @@ examples {
             requiredWithNull: NullableInnerClass(
                 value: nil
             ),
-            nullable: nil
+            nullObject: nil
         )
         static let nullObject: UnusedClass? = nil
         struct OuterClass {
             let required: InnerClass
             let requiredWithNull: NullableInnerClass
-            let nullable: InnerClass?
+            let nullObject: InnerClass?
         }
         struct InnerClass {
             let value: Bool
@@ -178,12 +178,12 @@ examples {
     }
     """
   }
-  ["Kotlin Nullable Values"] {
+  ["Nullable Properties: Kotlin"] {
     """
     package my.package
     
-    object NullableTypes {
-        val someNullableString: String? = null
+    object NullableProperties {
+        val nullableString: String? = null
         val nullableObject: OuterClass? = OuterClass(
             required = InnerClass(
                 value = true
@@ -191,13 +191,13 @@ examples {
             requiredWithNull = NullableInnerClass(
                 value = null
             ),
-            nullable = null
+            nullObject = null
         )
         val nullObject: UnusedClass? = null
         data class OuterClass(
             val required: InnerClass,
             val requiredWithNull: NullableInnerClass,
-            val nullable: InnerClass?
+            val nullObject: InnerClass?
         )
         data class InnerClass(
             val value: Boolean
@@ -211,32 +211,32 @@ examples {
     }
     """
   }
-  ["Swift Module Types"] {
+  ["Modules: Swift"] {
     """
-    enum ModuleTypes {
-        static let alice: ImportedModule = ImportedModule(
+    enum People {
+        static let alice: Person = Person(
             name: "Alice",
             age: 25
         )
-        static let bob: ImportedModule? = nil
-        struct ImportedModule {
+        static let bob: Person? = nil
+        struct Person {
             let name: String
             let age: Int
         }
     }
     """
   }
-  ["Kotlin Module Types"] {
+  ["Modules: Kotlin"] {
     """
     package my.package
     
-    object ModuleTypes {
-        val alice: ImportedModule = ImportedModule(
+    object People {
+        val alice: Person = Person(
             name = "Alice",
             age = 25
         )
-        val bob: ImportedModule? = null
-        data class ImportedModule(
+        val bob: Person? = null
+        data class Person(
             val name: String,
             val age: Long
         )

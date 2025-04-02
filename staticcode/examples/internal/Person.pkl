@@ -14,7 +14,7 @@
 // limitations under the License.
 //
 
-module ImportedModule
+module Person
 
 name: String
 age: Int

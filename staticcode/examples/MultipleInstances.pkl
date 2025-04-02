@@ -14,7 +14,8 @@
 // limitations under the License.
 //
 
-module RepeatedTypes
+/// An example showing multiple instances of the same type, some of which are nested.
+module MultipleInstances
 
 import "../StaticCode.pkl"
 
@@ -40,6 +41,6 @@ local class Cover {
 output {
   renderer = new StaticCode.Renderer {
     language = "Swift"
-    objectName = "TestTypes"
+    objectName = "Equipment"
   }
 }

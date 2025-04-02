@@ -18,46 +18,46 @@ amends "pkl:test"
 
 import "../StaticCode.pkl"
 
-import "../examples/SampleConfiguration.pkl"
-import "../examples/SimpleModule.pkl"
-import "../examples/RepeatedTypes.pkl"
-import "../examples/NullableValues.pkl"
-import "../examples/ModuleTypes.pkl"
+import "../examples/StandardTypes.pkl"
+import "../examples/Basic.pkl"
+import "../examples/MultipleInstances.pkl"
+import "../examples/NullableProperties.pkl"
+import "../examples/Modules.pkl"
 
 examples {
-  ["Swift Renderer"] {
-    SampleConfiguration.output.text
+  ["Standard Types: Swift"] {
+    StandardTypes.output.text
   }
-  ["Kotlin Renderer"] {
-    (SampleConfiguration) { output { renderer = makeKotlinRenderer("TestConfiguration") } }.output.text
-  }
-
-  ["Swift Simple Module"] {
-    SimpleModule.output.text
-  }
-  ["Kotlin Simple Module"] {
-    (SimpleModule) { output { renderer = makeKotlinRenderer("TestModule") } }.output.text
+  ["Standard Types: Kotlin"] {
+    (StandardTypes) { output { renderer = makeKotlinRenderer("StandardTypes") } }.output.text
   }
 
-  ["Swift Repeated Types"] {
-    RepeatedTypes.output.text
+  ["Basic: Swift"] {
+    Basic.output.text
   }
-  ["Kotlin Repeated Types"] {
-    (RepeatedTypes) { output { renderer = makeKotlinRenderer("TestTypes") } }.output.text
-  }
-
-  ["Swift Nullable Values"] {
-    NullableValues.output.text
-  }
-  ["Kotlin Nullable Values"] {
-    (NullableValues) { output { renderer = makeKotlinRenderer("NullableTypes") } }.output.text
+  ["Basic: Kotlin"] {
+    (Basic) { output { renderer = makeKotlinRenderer("User") } }.output.text
   }
 
-  ["Swift Module Types"] {
-    ModuleTypes.output.text
+  ["Multiple Instances: Swift"] {
+    MultipleInstances.output.text
   }
-  ["Kotlin Module Types"] {
-    (ModuleTypes) { output { renderer = makeKotlinRenderer("ModuleTypes") } }.output.text
+  ["Multiple Instances: Kotlin"] {
+    (MultipleInstances) { output { renderer = makeKotlinRenderer("Equipment") } }.output.text
+  }
+
+  ["Nullable Properties: Swift"] {
+    NullableProperties.output.text
+  }
+  ["Nullable Properties: Kotlin"] {
+    (NullableProperties) { output { renderer = makeKotlinRenderer("NullableProperties") } }.output.text
+  }
+
+  ["Modules: Swift"] {
+    Modules.output.text
+  }
+  ["Modules: Kotlin"] {
+    (Modules) { output { renderer = makeKotlinRenderer("People") } }.output.text
   }
 }
 

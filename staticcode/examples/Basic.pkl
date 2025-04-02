@@ -14,7 +14,8 @@
 // limitations under the License.
 //
 
-module SimpleModule
+/// A basic example showing a couple of properties along with another that is hidden.
+module Basic
 
 import "../StaticCode.pkl"
 
@@ -23,11 +24,11 @@ friends: Listing<String> = new Listing {
   "Bob"
   "Charlie"
 }
-hidden secret = "🤫"
+hidden password = "🤫"
 
 output {
   renderer = new StaticCode.Renderer {
     language = "Swift"
-    objectName = "TestModule"
+    objectName = "User"
   }
 }

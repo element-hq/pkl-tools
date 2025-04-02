@@ -14,7 +14,9 @@
 // limitations under the License.
 //
 
+/// An example that shows the rendering of standard language types.
 module SampleConfiguration
+
 import "../StaticCode.pkl"
 
 someString = "Hello, World!"
@@ -57,6 +59,6 @@ local class SomeOtherClass {
 output {
   renderer = new StaticCode.Renderer {
     language = "Swift"
-    objectName = "TestConfiguration"
+    objectName = "StandardTypes"
   }
 }

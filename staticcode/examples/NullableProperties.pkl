@@ -14,15 +14,16 @@
 // limitations under the License.
 //
 
-module NullableValues
+/// An example that shows the rendering of nullable properties, both set and unset.
+module NullableProperties
 
 import "../StaticCode.pkl"
 
-someNullableString: String? = null
+nullableString: String? = null
 
-nullableObject: OuterClass? = new OuterClass {
-  required = new InnerClass { value = true }
-  requiredWithNull = new NullableInnerClass { }
+nullableObject: OuterClass? = new {
+  required = new { value = true }
+  requiredWithNull = new { }
 }
 
 nullObject: UnusedClass?
@@ -30,15 +31,15 @@ nullObject: UnusedClass?
 local class OuterClass {
   required: InnerClass
   requiredWithNull: NullableInnerClass
-  nullable: InnerClass?
-}
-
-local class NullableInnerClass {
-  value: Boolean?
+  nullObject: InnerClass?
 }
 
 local class InnerClass {
   value: Boolean
+}
+
+local class NullableInnerClass {
+  value: Boolean?
 }
 
 local class UnusedClass {
@@ -48,6 +49,6 @@ local class UnusedClass {
 output {
   renderer = new StaticCode.Renderer {
     language = "Swift"
-    objectName = "NullableTypes"
+    objectName = "NullableProperties"
   }
 }

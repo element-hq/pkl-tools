@@ -14,21 +14,22 @@
 // limitations under the License.
 //
 
-module ModuleTypes
+/// An example showing the rendering of imported modules.
+module Modules
 
-import "internal/ImportedModule.pkl"
+import "internal/Person.pkl"
 import "../StaticCode.pkl"
 
-alice = new ImportedModule {
+alice = new Person {
   name = "Alice"
   age = 25
 }
 
-bob: ImportedModule? = null
+bob: Person? = null
 
 output {
   renderer = new StaticCode.Renderer {
     language = "Swift"
-    objectName = "ModuleTypes"
+    objectName = "People"
   }
 }
