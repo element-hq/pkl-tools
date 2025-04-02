@@ -19,7 +19,7 @@ amends "pkl:Project"
 package {
   name = "staticcode"
   baseUri = "package://pkg.pkl-lang.org/github.com/element-hq/pkl-tools/\(name)"
-  version = "1.0.0"
+  version = "1.0.1"
   packageZipUrl = "https://github.com/element-hq/pkl-tools/releases/download/\(name)@\(version)/\(name)@\(version).zip"
 }
 
