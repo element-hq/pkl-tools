@@ -19,3 +19,7 @@ dependencies {
   ["staticcode"] { uri = "package://pkg.pkl-lang.org/github.com/element-hq/pkl-tools/staticcode@1.0.0" }
 }
 ```
+
+## Releasing
+
+Instructions to make a new release of a package can be found in the [release](release/) directory.
