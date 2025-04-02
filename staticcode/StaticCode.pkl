@@ -14,7 +14,7 @@
 // limitations under the License.
 //
 
-module io.element.staticCode.StaticCode
+module io.element.staticcode.StaticCode
 
 import "pkl:reflect"
 import "Swift.pkl"
