@@ -1,0 +1,24 @@
+name: Tests
+
+on:
+  workflow_dispatch:
+  
+  push:
+    branches: [ main ]
+  
+  pull_request:
+
+jobs:
+  tests:
+    name: StaticCode
+    runs-on: macos-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install Pkl
+      run: brew install pkl
+
+    - name: Run tests
+      working-directory: staticcode
+      run: pkl test
