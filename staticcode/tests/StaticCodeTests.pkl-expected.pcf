@@ -30,6 +30,68 @@ examples {
     }
     """
   }
+  ["Standard Types: Swift nonisolated"] {
+    """
+    nonisolated enum StandardTypes {
+        static let someString: String = "Hello, World!"
+        static let someOptionalString: String? = nil
+        static let someObject: SomeClass = SomeClass(
+            someString: "bob",
+            someInteger: 0,
+            anEmptyStringList: [],
+            anIntList: [1, 2, 3],
+            aStringList: ["A", "B", "C"],
+            someNestedObject: SomeOtherClass(
+                someBoolean: false,
+                someDecimal: 0.5
+            )
+        )
+        nonisolated struct SomeClass {
+            let someString: String
+            let someInteger: Int
+            let anEmptyStringList: Array<String>
+            let anIntList: Array<Int>
+            let aStringList: Array<String>
+            let someNestedObject: SomeOtherClass
+        }
+        nonisolated struct SomeOtherClass {
+            let someBoolean: Bool
+            let someDecimal: Double
+        }
+    }
+    """
+  }
+  ["Standard Types: Swift @MainActor"] {
+    """
+    @MainActor enum StandardTypes {
+        static let someString: String = "Hello, World!"
+        static let someOptionalString: String? = nil
+        static let someObject: SomeClass = SomeClass(
+            someString: "bob",
+            someInteger: 0,
+            anEmptyStringList: [],
+            anIntList: [1, 2, 3],
+            aStringList: ["A", "B", "C"],
+            someNestedObject: SomeOtherClass(
+                someBoolean: false,
+                someDecimal: 0.5
+            )
+        )
+        @MainActor struct SomeClass {
+            let someString: String
+            let someInteger: Int
+            let anEmptyStringList: Array<String>
+            let anIntList: Array<Int>
+            let aStringList: Array<String>
+            let someNestedObject: SomeOtherClass
+        }
+        @MainActor struct SomeOtherClass {
+            let someBoolean: Bool
+            let someDecimal: Double
+        }
+    }
+    """
+  }
   ["Standard Types: Kotlin"] {
     """
     package my.package
@@ -72,6 +134,15 @@ examples {
     }
     """
   }
+  ["Basic: Swift nonisolated"] {
+    """
+    nonisolated enum User {
+        static let name: String = "Alice"
+        static let friends: Array<String> = ["Bob", "Charlie"]
+    
+    }
+    """
+  }
   ["Basic: Kotlin"] {
     """
     package my.package
@@ -108,6 +179,37 @@ examples {
             let name: String
         }
         struct Cover {
+            let name: String
+            let device: Device
+        }
+    }
+    """
+  }
+  ["Multiple Instances: Swift nonisolated"] {
+    """
+    nonisolated enum Equipment {
+        static let phone: Device = Device(
+            name: "iPhone"
+        )
+        static let tablet: Device = Device(
+            name: "iPad"
+        )
+        static let laptop: Device = Device(
+            name: "MacBook"
+        )
+        static let desktop: Device = Device(
+            name: "iMac"
+        )
+        static let cover: Cover = Cover(
+            name: "Magic Keyboard",
+            device: Device(
+                name: "iPad"
+            )
+        )
+        nonisolated struct Device {
+            let name: String
+        }
+        nonisolated struct Cover {
             let name: String
             let device: Device
         }
@@ -178,6 +280,37 @@ examples {
     }
     """
   }
+  ["Nullable Properties: Swift nonisolated"] {
+    """
+    nonisolated enum NullableProperties {
+        static let nullableString: String? = nil
+        static let nullableObject: OuterClass? = OuterClass(
+            required: InnerClass(
+                value: true
+            ),
+            requiredWithNull: NullableInnerClass(
+                value: nil
+            ),
+            nullObject: nil
+        )
+        static let nullObject: UnusedClass? = nil
+        nonisolated struct OuterClass {
+            let required: InnerClass
+            let requiredWithNull: NullableInnerClass
+            let nullObject: InnerClass?
+        }
+        nonisolated struct InnerClass {
+            let value: Bool
+        }
+        nonisolated struct NullableInnerClass {
+            let value: Bool?
+        }
+        nonisolated struct UnusedClass {
+            let value: String
+        }
+    }
+    """
+  }
   ["Nullable Properties: Kotlin"] {
     """
     package my.package
@@ -220,6 +353,21 @@ examples {
         )
         static let bob: Person? = nil
         struct Person {
+            let name: String
+            let age: Int
+        }
+    }
+    """
+  }
+  ["Modules: Swift nonisolated"] {
+    """
+    nonisolated enum People {
+        static let alice: Person = Person(
+            name: "Alice",
+            age: 25
+        )
+        static let bob: Person? = nil
+        nonisolated struct Person {
             let name: String
             let age: Int
         }
