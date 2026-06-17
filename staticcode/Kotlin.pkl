@@ -34,12 +34,14 @@ class ReflectedObject extends StaticCode.ReflectedType {
   function render(indentLevel: Int): String =
     """
     \(indent(indentLevel))object \(name.capitalize()) {
-    \(properties.map((property) ->
-      if (property is ReflectedObject)
-        "\(indent(indentLevel + 1))val \(property.name): \(property.renderedTypeHint) = \(property.renderValue(indentLevel + 1))"
-      else
-        "\(property.render(indentLevel + 1))"
-    ).join("\n"))
+    \(properties
+      .map((property) ->
+        if (property is ReflectedObject)
+          "\(indent(indentLevel + 1))val \(property.name): \(property.renderedTypeHint) = \(property.renderValue(indentLevel + 1))"
+        else
+          "\(property.render(indentLevel + 1))"
+      )
+      .join("\n"))
     \(typeDefinitions.map((property) -> property.renderDefinition(indentLevel + 1)).join("\n"))
     \(indent(indentLevel))}
     """
@@ -51,12 +53,14 @@ class ReflectedObject extends StaticCode.ReflectedType {
     else
       """
       \(renderedType)(
-      \(properties.map((property) ->
-        if (property is ReflectedObject)
-          "\(indent(indentLevel + 1))\(property.name) = \(property.renderValue(indentLevel + 1))"
-        else
-          "\(indent(indentLevel + 1))\(property.name) = \(property.renderedValue)"
-      ).join(",\n"))
+      \(properties
+        .map((property) ->
+          if (property is ReflectedObject)
+            "\(indent(indentLevel + 1))\(property.name) = \(property.renderValue(indentLevel + 1))"
+          else
+            "\(indent(indentLevel + 1))\(property.name) = \(property.renderedValue)"
+        )
+        .join(",\n"))
       \(indent(indentLevel)))
       """
 
@@ -64,27 +68,30 @@ class ReflectedObject extends StaticCode.ReflectedType {
   function renderDefinition(indentLevel: Int): String =
     """
     \(indent(indentLevel))data class \(renderedType)(
-    \(properties.map((property) ->
-      if (property is ReflectedObject)
-        "\(indent(indentLevel + 1))val \(property.name): \(property.renderedTypeHint)"
-      else
-        "\(indent(indentLevel + 1))val \(property.name): \(property.renderedType)"
-    ).join(",\n"))
+    \(properties
+      .map((property) ->
+        if (property is ReflectedObject)
+          "\(indent(indentLevel + 1))val \(property.name): \(property.renderedTypeHint)"
+        else
+          "\(indent(indentLevel + 1))val \(property.name): \(property.renderedType)"
+      )
+      .join(",\n"))
     \(indent(indentLevel)))
     """
 
   fixed renderedType = typeName.capitalize()
-  fixed renderedTypeHint: String =
-    if (nullable) "\(renderedType)?" else renderedType
+  fixed renderedTypeHint: String = if (nullable) "\(renderedType)?" else renderedType
 
   hidden fixed typeDefinitions: List<ReflectedObject> =
-    properties.flatMap((property) ->
-      if (property is ReflectedObject)
-        List(property) + property.typeDefinitions
-      else
-        List()
-    )
-      .toMap((property) -> property.typeName, (property) -> property).values // Remove duplicates based on typeName.
+    properties
+      .flatMap((property) ->
+        if (property is ReflectedObject)
+          List(property) + property.typeDefinitions
+        else
+          List()
+      )
+      .toMap((property) -> property.typeName, (property) -> property)
+      .values // Remove duplicates based on typeName.
 }
 
 /// An object's property without an accompanying value.
@@ -96,13 +103,18 @@ open class ReflectedPropertyDefinition extends StaticCode.ReflectedType {
   typeArguments: List<String>
   nullable: Boolean
 
-  function render(indentLevel: Int): String =
-    "\(indent(indentLevel))val \(name): \(renderedType)"
+  function render(indentLevel: Int): String = "\(indent(indentLevel))val \(name): \(renderedType)"
 
   fixed renderedType: String =
     let (kotlinType = typeMap.getOrNull(type) ?? type)
-      let (finalType = if (kotlinType == "List") "List<\(typeMap[typeArguments.getOrNull(0) ?? "Any"])>" else kotlinType)
-        if (nullable) "\(finalType)?" else finalType
+    let (
+      finalType =
+        if (kotlinType == "List")
+          "List<\(typeMap[typeArguments.getOrNull(0) ?? "Any"])>"
+        else
+          kotlinType
+    )
+      if (nullable) "\(finalType)?" else finalType
 
   hidden typeMap: Mapping<String, String> = new {
     ["Int"] = "Long"
@@ -145,9 +157,11 @@ class ReflectedProperty extends ReflectedPropertyDefinition {
 
   local function renderString(value: String) =
     if (value.contains("\n"))
-      ("\"\"\"" +
-        value +
-        "\"\"\"")
+      (
+        "\"\"\""
+          + value
+          + "\"\"\""
+      )
     else
       "\"" + value + "\""
 }

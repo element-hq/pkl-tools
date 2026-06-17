@@ -17,10 +17,11 @@
 module io.element.staticcode.StaticCode
 
 import "pkl:reflect"
-import "Swift.pkl"
-import "Kotlin.pkl"
 
-typealias Language = "Swift"|"Kotlin"
+import "Kotlin.pkl"
+import "Swift.pkl"
+
+typealias Language = "Swift" | "Kotlin"
 
 /// A value renderer that outputs Swift code.
 class Renderer extends ValueRenderer {
@@ -33,14 +34,17 @@ class Renderer extends ValueRenderer {
   /// The top-level object's name.
   objectName = "Configuration"
 
-  converters: Mapping<Class|String, (unknown) -> Any>
+  converters: Mapping<Class | String, (unknown) -> Any>
   extension = if (language == "Swift") "swift" else "kt"
 
   function renderDocument(value: Any) =
     if (value is Module)
       let (reflectedModule = reflectObject(objectName, value, false))
-      let (header = if (language == "Kotlin" && !packageName.isEmpty) "package \(packageName)\n\n" else "")
-      header + reflectedModule.render(0)
+      let (
+        header =
+          if (language == "Kotlin" && !packageName.isEmpty) "package \(packageName)\n\n" else ""
+      )
+        header + reflectedModule.render(0)
     else
       throw("Can only render a module")
 
@@ -49,14 +53,14 @@ class Renderer extends ValueRenderer {
   function reflectType(property: reflect.Property, value: Any, isDefinition: Boolean): ReflectedType =
     if (value is Typed)
       let (nullable = property.type is reflect.NullableType)
-      reflectObject(property.name, value, nullable)
+        reflectObject(property.name, value, nullable)
     else if (property.type is reflect.DeclaredType || property.type is reflect.NullableType)
       let (unwrappedTypeName = unwrapType(property.type).referent.reflectee.simpleName)
-      if (value == null && !valueTypes.contains(unwrappedTypeName))
-        // Make sure we collect the object's type definition to be included for rendering.
-        reflectNullObject(property)
-      else
-        reflectTypedProperty(property, value, isDefinition)
+        if (value == null && !valueTypes.contains(unwrappedTypeName))
+          // Make sure we collect the object's type definition to be included for rendering.
+          reflectNullObject(property)
+        else
+          reflectTypedProperty(property, value, isDefinition)
     else if (property.type is reflect.UnknownType)
       reflectUnknownProperty(property, value)
     else
@@ -64,76 +68,94 @@ class Renderer extends ValueRenderer {
 
   local function reflectObject(_name: String, _value: Typed, _nullable: Boolean): ReflectedType =
     let (reflectedClass = reflect.Class(_value.getClass()))
-    let (_properties = reflectedClass.properties.values
-      .filter((property) -> shouldRenderProperty(property))
-      .map((property) -> reflectType(property, _value.getProperty(property.name), false)))
+    let (
+      _properties =
+        reflectedClass.properties.values
+          .filter((property) -> shouldRenderProperty(property))
+          .map((property) -> reflectType(property, _value.getProperty(property.name), false))
+    )
     // For classes we can't use toString as it includes the module name as a prefix so we use simpleName
     // However we can't use simpleName on modules as that returns ModuleClass so we need toString for that.
-    let (_typeName = if (_value is Module) reflectedClass.reflectee.toString() else reflectedClass.reflectee.simpleName)
-
-    if (language == "Swift")
-      new Swift.ReflectedObject {
-        name = _name
-        typeName = _typeName
-        nullable = _nullable
-        properties = _properties
-      }
-    else
-      new Kotlin.ReflectedObject {
-        name = _name
-        typeName = _typeName
-        nullable = _nullable
-        properties = _properties
-      }
+    let (
+      _typeName =
+        if (_value is Module)
+          reflectedClass.reflectee.toString()
+        else
+          reflectedClass.reflectee.simpleName
+    )
+      if (language == "Swift")
+        new Swift.ReflectedObject {
+          name = _name
+          typeName = _typeName
+          nullable = _nullable
+          properties = _properties
+        }
+      else
+        new Kotlin.ReflectedObject {
+          name = _name
+          typeName = _typeName
+          nullable = _nullable
+          properties = _properties
+        }
 
   local function reflectNullObject(property: reflect.Property): ReflectedType =
     let (unwrappedType = unwrapType(property.type))
     let (reflectedClass = reflect.Class(unwrappedType.referent.reflectee as Class))
-    let (_properties = reflectedClass.properties.values
-      .filter((property) -> shouldRenderProperty(property))
-      .map((property) -> reflectType(property, null, true)))
+    let (
+      _properties =
+        reflectedClass.properties.values
+          .filter((property) -> shouldRenderProperty(property))
+          .map((property) -> reflectType(property, null, true))
+    )
     // For classes we can't use toString as it includes the module name as a prefix so we use simpleName
     // However we can't use simpleName on modules as that returns ModuleClass so we need toString for that.
-    let (_typeName = if (reflectedClass.name == "ModuleClass") reflectedClass.reflectee.toString() else reflectedClass.name)
+    let (
+      _typeName =
+        if (reflectedClass.name == "ModuleClass")
+          reflectedClass.reflectee.toString()
+        else
+          reflectedClass.name
+    )
+      if (language == "Swift")
+        new Swift.ReflectedObject {
+          name = property.name
+          typeName = _typeName
+          nullable = true
+          properties = _properties
+        }
+      else
+        new Kotlin.ReflectedObject {
+          name = property.name
+          typeName = _typeName
+          nullable = true
+          properties = _properties
+        }
 
-    if (language == "Swift")
-      new Swift.ReflectedObject {
-        name = property.name
-        typeName = _typeName
-        nullable = true
-        properties = _properties
-      }
-    else
-      new Kotlin.ReflectedObject {
-        name = property.name
-        typeName = _typeName
-        nullable = true
-        properties = _properties
-      }
-
-  local function reflectTypedProperty(property: reflect.Property, _value: Any, isDefinition: Boolean): ReflectedType =
+  local function reflectTypedProperty(
+    property: reflect.Property,
+    _value: Any,
+    isDefinition: Boolean,
+  ): ReflectedType =
     let (type = unwrapType(property.type))
     let (typeName = type.referent.reflectee.simpleName)
     let (_typeArguments = type.typeArguments.map((type) -> type.referent.reflectee.simpleName))
     let (_nullable = property.type is reflect.NullableType)
-
-    if (isDefinition)
-      if (language == "Swift")
-        new Swift.ReflectedPropertyDefinition {
-          name = property.name
-          type = typeName
-          typeArguments = _typeArguments
-          nullable = _nullable
-        }
-      else
-        new Kotlin.ReflectedPropertyDefinition {
-          name = property.name
-          type = typeName
-          typeArguments = _typeArguments
-          nullable = _nullable
-        }
-    else
-      if (language == "Swift")
+      if (isDefinition)
+        if (language == "Swift")
+          new Swift.ReflectedPropertyDefinition {
+            name = property.name
+            type = typeName
+            typeArguments = _typeArguments
+            nullable = _nullable
+          }
+        else
+          new Kotlin.ReflectedPropertyDefinition {
+            name = property.name
+            type = typeName
+            typeArguments = _typeArguments
+            nullable = _nullable
+          }
+      else if (language == "Swift")
         new Swift.ReflectedProperty {
           name = property.name
           type = typeName
@@ -153,22 +175,22 @@ class Renderer extends ValueRenderer {
   local function reflectUnknownProperty(property: reflect.Property, _value: Any): ReflectedType =
     if (valueTypes.contains(_value.getClass().simpleName))
       let (_type = _value.getClass().simpleName)
-      if (language == "Swift")
-        new Swift.ReflectedProperty {
-          name = property.name
-          type = _type
-          typeArguments = List()
-          nullable = false
-          value = _value
-        }
-      else
-        new Kotlin.ReflectedProperty {
-          name = property.name
-          type = _type
-          typeArguments = List()
-          nullable = false
-          value = _value
-        }
+        if (language == "Swift")
+          new Swift.ReflectedProperty {
+            name = property.name
+            type = _type
+            typeArguments = List()
+            nullable = false
+            value = _value
+          }
+        else
+          new Kotlin.ReflectedProperty {
+            name = property.name
+            type = _type
+            typeArguments = List()
+            nullable = false
+            value = _value
+          }
     else if (_value == null)
       throw("\(property.name) is null but doesn't explicitly declare a type, please add one.")
     else
@@ -178,7 +200,10 @@ class Renderer extends ValueRenderer {
     property.name != "output" && !property.modifiers.contains("hidden")
 
   local function unwrapType(baseType: reflect.Type): reflect.DeclaredType =
-    if (baseType is reflect.NullableType) baseType.member as reflect.DeclaredType else baseType as reflect.DeclaredType
+    if (baseType is reflect.NullableType)
+      baseType.member as reflect.DeclaredType
+    else
+      baseType as reflect.DeclaredType
 
   hidden valueTypes = new Listing {
     "Int"

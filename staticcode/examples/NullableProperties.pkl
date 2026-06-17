@@ -23,7 +23,7 @@ nullableString: String? = null
 
 nullableObject: OuterClass? = new {
   required = new { value = true }
-  requiredWithNull = new { }
+  requiredWithNull = new {}
 }
 
 nullObject: UnusedClass?
