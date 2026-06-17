@@ -27,12 +27,25 @@ examples {
   ["Standard Types: Swift"] {
     StandardTypes.output.text
   }
+  ["Standard Types: Swift nonisolated"] {
+    (StandardTypes) { output { renderer = makeSwift6Renderer("StandardTypes", "nonisolated") } }
+      .output
+      .text
+  }
+  ["Standard Types: Swift @MainActor"] {
+    (StandardTypes) { output { renderer = makeSwift6Renderer("StandardTypes", "@MainActor") } }
+      .output
+      .text
+  }
   ["Standard Types: Kotlin"] {
     (StandardTypes) { output { renderer = makeKotlinRenderer("StandardTypes") } }.output.text
   }
 
   ["Basic: Swift"] {
     Basic.output.text
+  }
+  ["Basic: Swift nonisolated"] {
+    (Basic) { output { renderer = makeSwift6Renderer("User", "nonisolated") } }.output.text
   }
   ["Basic: Kotlin"] {
     (Basic) { output { renderer = makeKotlinRenderer("User") } }.output.text
@@ -41,12 +54,24 @@ examples {
   ["Multiple Instances: Swift"] {
     MultipleInstances.output.text
   }
+  ["Multiple Instances: Swift nonisolated"] {
+    (MultipleInstances) { output { renderer = makeSwift6Renderer("Equipment", "nonisolated") } }
+      .output
+      .text
+  }
   ["Multiple Instances: Kotlin"] {
     (MultipleInstances) { output { renderer = makeKotlinRenderer("Equipment") } }.output.text
   }
 
   ["Nullable Properties: Swift"] {
     NullableProperties.output.text
+  }
+  ["Nullable Properties: Swift nonisolated"] {
+    (NullableProperties) {
+      output { renderer = makeSwift6Renderer("NullableProperties", "nonisolated") }
+    }
+      .output
+      .text
   }
   ["Nullable Properties: Kotlin"] {
     (NullableProperties) { output { renderer = makeKotlinRenderer("NullableProperties") } }
@@ -57,6 +82,9 @@ examples {
   ["Modules: Swift"] {
     Modules.output.text
   }
+  ["Modules: Swift nonisolated"] {
+    (Modules) { output { renderer = makeSwift6Renderer("People", "nonisolated") } }.output.text
+  }
   ["Modules: Kotlin"] {
     (Modules) { output { renderer = makeKotlinRenderer("People") } }.output.text
   }
@@ -66,4 +94,11 @@ local function makeKotlinRenderer(_objectName: String) = new StaticCode.Renderer
   language = "Kotlin"
   packageName = "my.package"
   objectName = _objectName
+}
+
+local function makeSwift6Renderer(_objectName: String, _isolation: StaticCode.Isolation) = new StaticCode
+  .Renderer {
+  language = "Swift"
+  objectName = _objectName
+  isolation = _isolation
 }

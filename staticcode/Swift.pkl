@@ -30,6 +30,8 @@ class ReflectedObject extends StaticCode.ReflectedType {
   typeName: String
   /// Whether or not this object is allowed to be null.
   nullable: Boolean
+  /// The object's isolation.
+  isolation: StaticCode.Isolation?
   /// All of the object's properties.
   properties: List<StaticCode.ReflectedType>
 
@@ -39,7 +41,7 @@ class ReflectedObject extends StaticCode.ReflectedType {
   /// Renders the object as a top level enum containing static properties and and custom type definitions.
   function render(indentLevel: Int): String =
     """
-    \(indent(indentLevel))enum \(name.capitalize()) {
+    \(indent(indentLevel))\(typeAnnotation)enum \(name.capitalize()) {
     \(properties
       .map((property) ->
         if (property is ReflectedObject)
@@ -73,7 +75,7 @@ class ReflectedObject extends StaticCode.ReflectedType {
   /// Renders the object's definition without any values.
   function renderDefinition(indentLevel: Int): String =
     """
-    \(indent(indentLevel))struct \(renderedType) {
+    \(indent(indentLevel))\(typeAnnotation)struct \(renderedType) {
     \(properties
       .map((property) ->
         if (property is ReflectedObject)
@@ -98,6 +100,12 @@ class ReflectedObject extends StaticCode.ReflectedType {
       )
       .toMap((property) -> property.typeName, (property) -> property)
       .values // Remove duplicates based on typeName.
+
+  hidden fixed typeAnnotation: String =
+    if (isolation != null)
+      isolation + " "
+    else
+      ""
 }
 
 /// An object's property without an accompanying value.

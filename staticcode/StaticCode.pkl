@@ -22,6 +22,7 @@ import "Kotlin.pkl"
 import "Swift.pkl"
 
 typealias Language = "Swift" | "Kotlin"
+typealias Isolation = "nonisolated" | "@MainActor"
 
 /// A value renderer that outputs Swift code.
 class Renderer extends ValueRenderer {
@@ -29,17 +30,21 @@ class Renderer extends ValueRenderer {
   language: Language
   /// The package that the rendered file belongs to.
   ///
-  /// Only used for the Kotlin language
+  /// Only used for the Kotlin language.
   packageName = ""
   /// The top-level object's name.
   objectName = "Configuration"
+  /// An explicit isolation to be used in the rendered code.
+  ///
+  /// Only used for the Swift language.
+  isolation: Isolation?
 
   converters: Mapping<Class | String, (unknown) -> Any>
   extension = if (language == "Swift") "swift" else "kt"
 
   function renderDocument(value: Any) =
     if (value is Module)
-      let (reflectedModule = reflectObject(objectName, value, false))
+      let (reflectedModule = reflectObject(objectName, value, false, isolation))
       let (
         header =
           if (language == "Kotlin" && !packageName.isEmpty) "package \(packageName)\n\n" else ""
@@ -53,7 +58,7 @@ class Renderer extends ValueRenderer {
   function reflectType(property: reflect.Property, value: Any, isDefinition: Boolean): ReflectedType =
     if (value is Typed)
       let (nullable = property.type is reflect.NullableType)
-        reflectObject(property.name, value, nullable)
+        reflectObject(property.name, value, nullable, isolation)
     else if (property.type is reflect.DeclaredType || property.type is reflect.NullableType)
       let (unwrappedTypeName = unwrapType(property.type).referent.reflectee.simpleName)
         if (value == null && !valueTypes.contains(unwrappedTypeName))
@@ -66,7 +71,12 @@ class Renderer extends ValueRenderer {
     else
       throw("\(property.name) has unsupported type: \(value.getClass())")
 
-  local function reflectObject(_name: String, _value: Typed, _nullable: Boolean): ReflectedType =
+  local function reflectObject(
+    _name: String,
+    _value: Typed,
+    _nullable: Boolean,
+    _isolation: Isolation?,
+  ): ReflectedType =
     let (reflectedClass = reflect.Class(_value.getClass()))
     let (
       _properties =
@@ -88,6 +98,7 @@ class Renderer extends ValueRenderer {
           name = _name
           typeName = _typeName
           nullable = _nullable
+          isolation = _isolation
           properties = _properties
         }
       else
@@ -116,11 +127,13 @@ class Renderer extends ValueRenderer {
         else
           reflectedClass.name
     )
+    let (_isolation = isolation)
       if (language == "Swift")
         new Swift.ReflectedObject {
           name = property.name
           typeName = _typeName
           nullable = true
+          isolation = _isolation
           properties = _properties
         }
       else
