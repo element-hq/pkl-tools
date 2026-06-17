@@ -19,6 +19,9 @@ jobs:
     - name: Install Pkl
       run: brew install pkl
 
+    - name: Check formatting
+      run: pkl format --diff-name-only .
+
     - name: Run tests
       working-directory: staticcode
       run: pkl test

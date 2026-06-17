@@ -17,8 +17,8 @@
 /// An example showing the rendering of imported modules.
 module Modules
 
-import "internal/Person.pkl"
 import "../StaticCode.pkl"
+import "internal/Person.pkl"
 
 alice = new Person {
   name = "Alice"
