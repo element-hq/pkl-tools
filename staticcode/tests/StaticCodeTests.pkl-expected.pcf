@@ -10,6 +10,7 @@ examples {
             anEmptyStringList: [],
             anIntList: [1, 2, 3],
             aStringList: ["A", "B", "C"],
+            aNestedIntList: [[1, 2], [3]],
             someNestedObject: SomeOtherClass(
                 someBoolean: false,
                 someDecimal: 0.5
@@ -21,6 +22,7 @@ examples {
             let anEmptyStringList: Array<String>
             let anIntList: Array<Int>
             let aStringList: Array<String>
+            let aNestedIntList: Array<Array<Int>>
             let someNestedObject: SomeOtherClass
         }
         struct SomeOtherClass {
@@ -41,6 +43,7 @@ examples {
             anEmptyStringList: [],
             anIntList: [1, 2, 3],
             aStringList: ["A", "B", "C"],
+            aNestedIntList: [[1, 2], [3]],
             someNestedObject: SomeOtherClass(
                 someBoolean: false,
                 someDecimal: 0.5
@@ -52,6 +55,7 @@ examples {
             let anEmptyStringList: Array<String>
             let anIntList: Array<Int>
             let aStringList: Array<String>
+            let aNestedIntList: Array<Array<Int>>
             let someNestedObject: SomeOtherClass
         }
         nonisolated struct SomeOtherClass {
@@ -72,6 +76,7 @@ examples {
             anEmptyStringList: [],
             anIntList: [1, 2, 3],
             aStringList: ["A", "B", "C"],
+            aNestedIntList: [[1, 2], [3]],
             someNestedObject: SomeOtherClass(
                 someBoolean: false,
                 someDecimal: 0.5
@@ -83,6 +88,7 @@ examples {
             let anEmptyStringList: Array<String>
             let anIntList: Array<Int>
             let aStringList: Array<String>
+            let aNestedIntList: Array<Array<Int>>
             let someNestedObject: SomeOtherClass
         }
         @MainActor struct SomeOtherClass {
@@ -105,6 +111,7 @@ examples {
             anEmptyStringList = listOf(),
             anIntList = listOf(1, 2, 3),
             aStringList = listOf("A", "B", "C"),
+            aNestedIntList = listOf(listOf(1, 2), listOf(3)),
             someNestedObject = SomeOtherClass(
                 someBoolean = false,
                 someDecimal = 0.5
@@ -116,6 +123,7 @@ examples {
             val anEmptyStringList: List<String>,
             val anIntList: List<Long>,
             val aStringList: List<String>,
+            val aNestedIntList: List<List<Long>>,
             val someNestedObject: SomeOtherClass
         )
         data class SomeOtherClass(
@@ -352,6 +360,16 @@ examples {
             age: 25
         )
         static let bob: Person? = nil
+        static let people: Array<Person> = [
+            Person(
+                name: "Carol",
+                age: 30
+            ),
+            Person(
+                name: "Dave",
+                age: 35
+            )
+        ]
         struct Person {
             let name: String
             let age: Int
@@ -367,6 +385,16 @@ examples {
             age: 25
         )
         static let bob: Person? = nil
+        static let people: Array<Person> = [
+            Person(
+                name: "Carol",
+                age: 30
+            ),
+            Person(
+                name: "Dave",
+                age: 35
+            )
+        ]
         nonisolated struct Person {
             let name: String
             let age: Int
@@ -384,9 +412,162 @@ examples {
             age = 25
         )
         val bob: Person? = null
+        val people: List<Person> = listOf(
+            Person(
+                name = "Carol",
+                age = 30
+            ),
+            Person(
+                name = "Dave",
+                age = 35
+            )
+        )
         data class Person(
             val name: String,
             val age: Long
+        )
+    }
+    """
+  }
+  ["Object Lists: Swift"] {
+    """
+    enum ObjectLists {
+        static let people: Array<Person> = [
+            Person(
+                name: "Alice",
+                age: 25
+            ),
+            Person(
+                name: "Bob",
+                age: 30
+            )
+        ]
+        static let teams: Array<Team> = [
+            Team(
+                name: "Engineering",
+                lead: Person(
+                    name: "Carol",
+                    age: 35
+                ),
+                members: [
+                    Person(
+                        name: "Dave",
+                        age: 28
+                    )
+                ]
+            ),
+            Team(
+                name: "Design",
+                lead: nil,
+                members: []
+            )
+        ]
+        static let noPeople: Array<Person> = []
+        static let nullablePeople: Array<Person>? = nil
+        struct Person {
+            let name: String
+            let age: Int
+        }
+        struct Team {
+            let name: String
+            let lead: Person?
+            let members: Array<Person>
+        }
+    }
+    """
+  }
+  ["Object Lists: Swift nonisolated"] {
+    """
+    nonisolated enum ObjectLists {
+        static let people: Array<Person> = [
+            Person(
+                name: "Alice",
+                age: 25
+            ),
+            Person(
+                name: "Bob",
+                age: 30
+            )
+        ]
+        static let teams: Array<Team> = [
+            Team(
+                name: "Engineering",
+                lead: Person(
+                    name: "Carol",
+                    age: 35
+                ),
+                members: [
+                    Person(
+                        name: "Dave",
+                        age: 28
+                    )
+                ]
+            ),
+            Team(
+                name: "Design",
+                lead: nil,
+                members: []
+            )
+        ]
+        static let noPeople: Array<Person> = []
+        static let nullablePeople: Array<Person>? = nil
+        nonisolated struct Person {
+            let name: String
+            let age: Int
+        }
+        nonisolated struct Team {
+            let name: String
+            let lead: Person?
+            let members: Array<Person>
+        }
+    }
+    """
+  }
+  ["Object Lists: Kotlin"] {
+    """
+    package my.package
+    
+    object ObjectLists {
+        val people: List<Person> = listOf(
+            Person(
+                name = "Alice",
+                age = 25
+            ),
+            Person(
+                name = "Bob",
+                age = 30
+            )
+        )
+        val teams: List<Team> = listOf(
+            Team(
+                name = "Engineering",
+                lead = Person(
+                    name = "Carol",
+                    age = 35
+                ),
+                members = listOf(
+                    Person(
+                        name = "Dave",
+                        age = 28
+                    )
+                )
+            ),
+            Team(
+                name = "Design",
+                lead = null,
+                members = listOf()
+            )
+        )
+        val noPeople: List<Person> = listOf()
+        val nullablePeople: List<Person>? = null
+        data class Person(
+            val name: String,
+            val age: Long
+        )
+        data class Team(
+            val name: String,
+            val lead: Person?,
+            val members: List<Person>
         )
     }
     """

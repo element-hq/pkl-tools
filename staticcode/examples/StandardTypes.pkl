@@ -36,6 +36,15 @@ someObject = new SomeClass {
     "B"
     "C"
   }
+  aNestedIntList = new Listing {
+    new Listing {
+      1
+      2
+    }
+    new Listing {
+      3
+    }
+  }
   someNestedObject = new SomeOtherClass {
     someBoolean = false
     someDecimal = 0.5
@@ -48,6 +57,7 @@ local class SomeClass {
   anEmptyStringList: Listing<String>
   anIntList: Listing<Int>
   aStringList: Listing<String>
+  aNestedIntList: Listing<Listing<Int>>
   someNestedObject: SomeOtherClass
 }
 

@@ -14,34 +14,62 @@
 // limitations under the License.
 //
 
-/// An example showing the rendering of imported modules.
-module Modules
+/// An example that shows the rendering of lists whose elements are objects.
+module ObjectLists
 
 import "../StaticCode.pkl"
-import "internal/Person.pkl"
-
-alice = new Person {
-  name = "Alice"
-  age = 25
-}
-
-bob: Person? = null
 
 people: List<Person> =
   List(
     new Person {
-      name = "Carol"
-      age = 30
+      name = "Alice"
+      age = 25
     },
     new Person {
-      name = "Dave"
-      age = 35
+      name = "Bob"
+      age = 30
     },
   )
+
+teams: List<Team> =
+  List(
+    new Team {
+      name = "Engineering"
+      lead = new Person {
+        name = "Carol"
+        age = 35
+      }
+      members = new {
+        new {
+          name = "Dave"
+          age = 28
+        }
+      }
+    },
+    new Team {
+      name = "Design"
+      members = new {}
+    },
+  )
+
+noPeople: List<Person> = List()
+
+nullablePeople: List<Person>? = null
+
+local class Person {
+  name: String
+  age: Int
+}
+
+local class Team {
+  name: String
+  lead: Person?
+  members: Listing<Person>
+}
 
 output {
   renderer = new StaticCode.Renderer {
     language = "Swift"
-    objectName = "People"
+    objectName = "ObjectLists"
   }
 }
