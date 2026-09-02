@@ -20,6 +20,7 @@ import "../examples/Basic.pkl"
 import "../examples/Modules.pkl"
 import "../examples/MultipleInstances.pkl"
 import "../examples/NullableProperties.pkl"
+import "../examples/ObjectLists.pkl"
 import "../examples/StandardTypes.pkl"
 import "../StaticCode.pkl"
 
@@ -77,6 +78,18 @@ examples {
     (NullableProperties) { output { renderer = makeKotlinRenderer("NullableProperties") } }
       .output
       .text
+  }
+
+  ["Object Lists: Swift"] {
+    ObjectLists.output.text
+  }
+  ["Object Lists: Swift nonisolated"] {
+    (ObjectLists) { output { renderer = makeSwift6Renderer("ObjectLists", "nonisolated") } }
+      .output
+      .text
+  }
+  ["Object Lists: Kotlin"] {
+    (ObjectLists) { output { renderer = makeKotlinRenderer("ObjectLists") } }.output.text
   }
 
   ["Modules: Swift"] {

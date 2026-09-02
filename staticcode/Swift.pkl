@@ -63,10 +63,7 @@ class ReflectedObject extends StaticCode.ReflectedType {
       \(renderedType)(
       \(properties
         .map((property) ->
-          if (property is ReflectedObject)
-            "\(indent(indentLevel + 1))\(property.name): \(property.renderValue(indentLevel + 1))"
-          else
-            "\(indent(indentLevel + 1))\(property.name): \(property.renderedValue)"
+          "\(indent(indentLevel + 1))\(property.name): \(property.renderValue(indentLevel + 1))"
         )
         .join(",\n"))
       \(indent(indentLevel)))
@@ -95,6 +92,13 @@ class ReflectedObject extends StaticCode.ReflectedType {
       .flatMap((property) ->
         if (property is ReflectedObject)
           List(property) + property.typeDefinitions
+        else if (property is ReflectedPropertyDefinition)
+          property.typeArguments.flatMap((argument) ->
+            if (argument is ReflectedObject)
+              List(argument) + argument.typeDefinitions
+            else
+              List()
+          )
         else
           List()
       )
@@ -114,7 +118,7 @@ class ReflectedObject extends StaticCode.ReflectedType {
 open class ReflectedPropertyDefinition extends StaticCode.ReflectedType {
   name: String
   type: String
-  typeArguments: List<String>
+  typeArguments: List<StaticCode.ReflectedType>
   nullable: Boolean
 
   function render(indentLevel: Int): String =
@@ -125,7 +129,7 @@ open class ReflectedPropertyDefinition extends StaticCode.ReflectedType {
     let (
       finalType =
         if (swiftType == "Array")
-          "Array<\(typeMap[typeArguments.getOrNull(0) ?? "Any"])>"
+          "Array<\(typeArguments.getOrNull(0)?.renderedType ?? "Any")>"
         else
           swiftType
     )
@@ -143,10 +147,18 @@ open class ReflectedPropertyDefinition extends StaticCode.ReflectedType {
 
 /// An object's property along with the value of this property.
 class ReflectedProperty extends ReflectedPropertyDefinition {
+  /// The property's value (raw or reflected as required).
   value: Any
 
   function render(indentLevel: Int): String =
-    "\(indent(indentLevel))static let \(name): \(renderedType) = \(renderedValue)"
+    "\(indent(indentLevel))static let \(name): \(renderedType) = \(renderValue(indentLevel))"
+
+  /// Renders the property's value, indented relative to the given level.
+  function renderValue(indentLevel: Int): String =
+    if (value is List)
+      renderList(indentLevel)
+    else
+      renderedValue
 
   fixed renderedValue: String =
     if (value == null)
@@ -155,18 +167,21 @@ class ReflectedProperty extends ReflectedPropertyDefinition {
       "\(value)"
     else if (value is String)
       renderString(value)
-    else if (value is List)
-      renderList(value)
-    else if (value is Listing)
-      renderList(value.toList())
     else
       throw("Unsupported value type (\(value.getClass())) encountered when rendering \(name)")
 
-  local function renderList(value: List) =
-    "[\(value.map((element) -> renderListElement(element)).join(", "))]"
-
-  local function renderListElement(value: Any) =
-    if (value is String) renderString(value) else "\(value)"
+  /// Renders the values as a list, inline unless one of them spans multiple lines.
+  local function renderList(indentLevel: Int): String =
+    let (listValues = value as List<StaticCode.ReflectedType>)
+    let (renderedValues = listValues.map((listValue) -> listValue.renderValue(indentLevel + 1)))
+      if (renderedValues.every((rendered) -> !rendered.contains("\n")))
+        "[\(renderedValues.join(", "))]"
+      else
+        """
+        [
+        \(renderedValues.map((rendered) -> "\(indent(indentLevel + 1))\(rendered)").join(",\n"))
+        \(indent(indentLevel))]
+        """
 
   local function renderString(value: String) =
     if (value.contains("\n"))
